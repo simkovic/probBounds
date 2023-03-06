@@ -1,5 +1,5 @@
 # Data files
-## vpinfo.res 
+## vpinfo.nfo 
 csv file that contains metainformation about participants, columns are: 
 * 1 participant id
 * 2 gender (1 - girl)
