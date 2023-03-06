@@ -1,4 +1,4 @@
-# calibCheck
+# probBounds
 Study of children's knowledge of probability conducted at Universität zu Köln by Matus Simkovic and Birgit Träuble during 2019-2022.
 
 # License
