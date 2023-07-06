@@ -49,8 +49,10 @@ def loadData(verbose=False):
        np.nan*np.zeros((K,3,11))]
     #,[None,None,0],np.nan*np.zeros((6,2))])
     nfos=[]
+    dknow=[]
     for k in range(K):
         fn=fns[k]
+        dknow.append([0,0])
         vp=int(fn.rsplit('.')[0].rsplit('vp')[1])
         nfo=info[(info[:,0]==vp).nonzero()[0][0],:]
         nfos.append(nfo)
@@ -75,17 +77,27 @@ def loadData(verbose=False):
             if temp[i]==1: D[2][k,ixs[0],ixs[1]]=1
             elif temp[i]==2: D[2][k,ixs[0],ixs[1]]=0
         #gleich w'lich 1
+        dknow[-1][1]+=1
         if temp[tl]==1: D[0][k,6,0]=1
         elif temp[tl]==2: D[0][k,6,0]=0
+        elif temp[tl]==3: dknow[-1][0]+=1
+        else:dknow[-1][1]-=1
         
         for i in range(6):#w'er Beispiele 6
+            dknow[-1][1]+=1
             if temp[i+tl+1]==3:D[3][k,i]=0
             elif temp[i+tl+1]==1: D[3][k,i]=1
             elif temp[i+tl+1]==2: D[3][k,i]=-1
+            elif temp[i+tl+1]==4: dknow[-1][0]+=1
+            else:dknow[-1][1]-=1
+            
         for i in range([9,11][int(version==1)+int(version==3)]):
+            dknow[-1][1]+=1
             sh=[0,2][int(i>4 and version==2)]
             if temp[i+tl+7]==1: D[4][k,i+sh]=1
             elif temp[i+tl+7]==2: D[4][k,i+sh]=0
+            elif temp[i+tl+7]==3: dknow[-1][0]+=1
+            else:dknow[-1][1]-=1
               
         if verbose: print('\tline 1 ok')
         for i in range(1,6):
@@ -143,10 +155,13 @@ def loadData(verbose=False):
     D.append(ag)
     print('\tage: mean= %.1f, median= %.1f, min= %.1f, max= %.1f, girls=%d):'%(ag.mean(),np.median(ag),np.min(ag),np.max(ag),info[:,1].sum()))
     np.savetxt('ccccc',ccccc,fmt='%d')
+    dknow=np.array(dknow)
+    #print(dknow)
+    print(dknow[:,0].sum(),' said dont know from ',dknow[:,1].sum())
     return D
       
 checkData()
-D=loadData() 
+D=loadData()
 
 def list2d2latextable(lst,decim=2,header=None,colheader=None):
     ''' array - 2D numpy.ndarray with shape (rows,columns)
@@ -199,7 +214,7 @@ print(20*'##','\n\n')#################
    
 bsp=['feuerwerk','schnee','rote ampel','1fc köln','blaue ampel','regen','sonne',
      'fischstäbchen','hagel','schule WT','schule WE']
-bsp=['Fireworks','Snow','Red traffic light','Soccer team','Blue traffic light','Rain','Sun',
+bsp=['Fireworks','Snow','Red traffic light','Soccer team','Blue traffic light','Rain','Rising sun',
      'Fish sticks','Hail','School WD','School WE']
 bspind=[4,0,3,7,1,8,5,2,6,9,10]
 bspsorted=list(np.array(bsp)[bspind])
@@ -225,18 +240,20 @@ b=np.nanmean(D[3]==0,0)
 c=np.nanmean(D[3]==-1,0)
 axL = plt.subplot(1,1,1)
 plt.barh(np.arange(D[3].shape[1]),width=a,color='r')
-plt.barh(np.arange(D[3].shape[1]),width=b,left=a,color='k')
-plt.barh(np.arange(D[3].shape[1]),width=c,left=a+b,color='g')
+plt.barh(np.arange(D[3].shape[1]),width=b,left=a,color='y')
+plt.barh(np.arange(D[3].shape[1]),width=c,left=a+b,color='k')
 plt.xlim([0,1])
 axL.set_xticks(np.linspace(0,1,11))
-axL.set_yticklabels(['','regen','ampel rot','regen','sonne','schnee','sonne'],color='r')
+#axL.set_yticklabels(['','regen','ampel rot','regen','sonne','schnee','sonne'],color='r')
+axL.set_yticklabels(['','rain','red tr. light','rain','rising sun','snow','rising sun'],color='r')
 plt.grid(True,axis='x')
 plt.ylim([-0.5,5.5])
 axR = plt.gca().twinx()
 axR.yaxis.tick_right()
 axR.set_yticks(np.arange(D[3].shape[1]))
 plt.ylim([-0.5,5.5])
-axR.set_yticklabels(['schnee','ampel blau','hagel','ampel rot','hagel','ampel blau'],color='g');
+#axR.set_yticklabels(['schnee','ampel blau','hagel','ampel rot','hagel','ampel blau'],color='g');
+axR.set_yticklabels(['snow','blue tr. light','hail','red tr. light','hail','blue tr. light'],color='k');
 plt.savefig(FPATH+'S1_comparison.png')
 #check transitivity: index 5 non-transitive
 # check consistency with line order data
@@ -332,6 +349,9 @@ lbl=['transitivität erwartet','transitivität zwingend','alle möglichen gleich
      'alle unmöglichen gleich','alle sicheren gleich','total wahrscheinlich',
      'total unwahrscheinlich','wahrscheinlicher als sicher',
      'unwahrscheinlicher als unmöglich','ordnung transitiv','linie transitiv']
+#print(D[4]);
+print((D[4]==2).sum(),' said dont know from all answered questions',(~np.isnan(D[4])).sum())
+D[4][D[4]==2]=np.nan
 T=np.nanmean(D[4],0)
 T2=np.nansum(D[4],0)
 T3=np.sum(~np.isnan(D[4]),0)
@@ -375,7 +395,7 @@ print(f'MCA % explained variance: {ev*100}')
 N=3
 print(ev[N:].sum(),ev.sum())
 figure(size=2,dpi=400)
-plt.plot(-fs[:,:N],-np.arange(len(lbls)),'-o')
+plt.plot(fs[:,:N],-np.arange(len(lbls)),'-o')
 ax=plt.gca()
 plt.plot([0,0],[1,-12],'k')
 ax.set_yticks(-np.arange(len(lbls)));
