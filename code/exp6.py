@@ -7,8 +7,6 @@ VERSION=3
 def infobox(pos,fn=None):
     import datetime
     from psychopy import gui          
-
-    
     myDlg = gui.Dlg(title='VP Info',pos=pos)    
     myDlg.addField('VP ID:',0)# subject id
     today=datetime.date.today()
@@ -74,7 +72,7 @@ Ich habe einige Fragen für dich. Es ist kein Test, keine Prüfung. Es gibt kein
 """]+L]
 
 tmp0=u'''Zuerst möchte ich wissen ob du bestimmte Wörter verstehst.
-1. Hast du das Wort MUSWU schon  mal gehört?
+1. Hast du das Wort MUSWU schon mal gehört?
 \t [nicht gehört] Alle nachfolgenden Unteraufgaben mit dem Wort weglassen
 2. Kannst du sagen was man damit meint wenn man sagt etwas ist MUSWU?
 \t [sagt nichts] ... wenn man sagt es ist MUSWU dass etwas passiert?

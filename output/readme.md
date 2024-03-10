@@ -2,7 +2,7 @@
 ## vpinfo.nfo 
 csv file that contains metainformation about participants, columns are: 
 * 1 participant id
-* 2 gender (1 - girl)
+* 2 gender (1 = girl)
 * 3 age in days
 * 4 id of the person in charge of experiment (0=MS, 1=LW, 3=FK)
 * 5 equal to 1 if caregiver gave consent with data publication
